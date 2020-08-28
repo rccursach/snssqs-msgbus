@@ -5,18 +5,6 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.MessageQueue = void 0;
 const aws_sdk_1 = __importDefault(require("aws-sdk"));
-const debugMessage = (type, message, data) => {
-    if (process.env.SNSSQS_MESSAGE_BUS_DEBUG) {
-        switch (type) {
-            case 'I':
-                console.log(`Info: ${message}`, data);
-                break;
-            case 'E':
-                console.error(`Error: ${message}`, data);
-                break;
-        }
-    }
-};
 ;
 class MessageQueue {
     constructor(awsRegion) {

@@ -6,18 +6,6 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.MessageBus = void 0;
 const aws_sdk_1 = __importDefault(require("aws-sdk"));
 const uuid_1 = require("uuid");
-const debugMessage = (type, message, data) => {
-    if (process.env.SNSSQS_MESSAGE_BUS_DEBUG) {
-        switch (type) {
-            case 'I':
-                console.log(`Info: ${message}`, data);
-                break;
-            case 'E':
-                console.error(`Error: ${message}`, data);
-                break;
-        }
-    }
-};
 class MessageBus {
     constructor(awsRegion, snsTopicARN) {
         this.snsInstance = new aws_sdk_1.default.SNS({
