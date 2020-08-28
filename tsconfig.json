@@ -8,7 +8,7 @@
     "esModuleInterop": true,
     "target": "es2019",
     "sourceMap": true,
-    "outDir": "./dist",
+    "outDir": "./build",
     "rootDir": "./src",
     "baseUrl": "./src",
     "paths": {
@@ -23,7 +23,7 @@
     },
     "incremental": true
   },
-  "exclude": ["node_modules", "dist", "common", "tests"]
+  "exclude": ["node_modules", "build", "common", "tests"]
 }
 
 // {
