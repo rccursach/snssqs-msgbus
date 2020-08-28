@@ -1,0 +1,8 @@
+{
+  "watch": ["src"],
+  "verbose": false,
+  "delay": "2500",
+  "ext": ".ts,.json",
+  "ignore": ["node_modules"],
+  "exec": "eslint --ext '.ts,.json' ./src && ts-node ./src/index.ts"
+}
