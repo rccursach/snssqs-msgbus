@@ -1,18 +1,5 @@
 import AWS from 'aws-sdk';
 
-const debugMessage = (type: 'E'| 'I', message: string, data?: any) => {
-  if (process.env.SNSSQS_MESSAGE_BUS_DEBUG) {
-    switch(type) {
-      case 'I':
-        console.log(`Info: ${message}`, data);
-        break;
-      case 'E':
-        console.error(`Error: ${message}`, data);
-        break;
-    }
-  }
-}
-
 // Interface for message processing callbacks
 export interface MessageQueueCallback { (messageId: string, messageBody: string, attributes?: any): void | Promise<void> };
 
@@ -41,10 +28,8 @@ export class MessageQueue {
   // Execute message callbacks.
   // Try to run this in a contained way, to avoid breaking other running callbacks
   private async executeCallbackOnMessages(messages: AWS.SQS.MessageList, subInfo: MessageQueueSub) {
-    // debugMessage('I', 'this is executeCallbackOnMessages->messages', messages);
     for (const m of messages) {
       try {
-        // debugMessage('I', 'This is the message received: ', m);
         console.log(`Processing ${m.MessageAttributes.command?.StringValue || 'UndefinedCommand'}:${m.MessageAttributes.originUuid?.StringValue || 'UndefinedOriginUuid'}. MessageId ${m.MessageId}`);
         // detect if callback is async and act accordingly
         if (subInfo.cb.constructor.name === "AsyncFunction") {
@@ -80,7 +65,6 @@ export class MessageQueue {
         pollingPromises.push(recvCall);
       }
       const pollingResults = await Promise.all(pollingPromises);
-      // debugMessage('I', 'PollingResults', pollingResults);
 
       // For each polling result execute its subscription callback without breaking the loop
       for (const [idx, r] of pollingResults.entries()) {
