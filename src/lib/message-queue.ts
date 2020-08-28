@@ -1,5 +1,18 @@
 import AWS from 'aws-sdk';
 
+const debugMessage = (type: 'E'| 'I', message: string, data?: any) => {
+  if (process.env.SNSSQS_MESSAGE_BUS_DEBUG) {
+    switch(type) {
+      case 'I':
+        console.log(`Info: ${message}`, data);
+        break;
+      case 'E':
+        console.error(`Error: ${message}`, data);
+        break;
+    }
+  }
+}
+
 // Interface for message processing callbacks
 export interface MessageQueueCallback { (messageId: string, messageBody: string, attributes?: any): void | Promise<void> };
 
@@ -17,6 +30,7 @@ export class MessageQueue {
     });
     this.status = 'STOPPED';
     this.timeoutHandler = undefined;
+    this.subscriptions = [];
   }
 
   sqsInstance: AWS.SQS;
@@ -27,23 +41,25 @@ export class MessageQueue {
   // Execute message callbacks.
   // Try to run this in a contained way, to avoid breaking other running callbacks
   private async executeCallbackOnMessages(messages: AWS.SQS.MessageList, subInfo: MessageQueueSub) {
+    // debugMessage('I', 'this is executeCallbackOnMessages->messages', messages);
     for (const m of messages) {
       try {
-        console.log(`Processing ${m.Attributes.command}:${m.Attributes.originUuid}. MessageId ${m.MessageId}`);
+        // debugMessage('I', 'This is the message received: ', m);
+        console.log(`Processing ${m.MessageAttributes.command?.StringValue || 'UndefinedCommand'}:${m.MessageAttributes.originUuid?.StringValue || 'UndefinedOriginUuid'}. MessageId ${m.MessageId}`);
         // detect if callback is async and act accordingly
         if (subInfo.cb.constructor.name === "AsyncFunction") {
-          await subInfo.cb(m.MessageId, m.Body, m.Attributes);
+          await subInfo.cb(m.MessageId, m.Body, m.MessageAttributes);
         } else {
-          subInfo.cb(m.MessageId, m.Body, m.Attributes);
+          subInfo.cb(m.MessageId, m.Body, m.MessageAttributes);
         }
         // Finally delete the message
         await this.sqsInstance.deleteMessage({
           ReceiptHandle: m.ReceiptHandle,
           QueueUrl: subInfo.url,
         }).promise();
-        console.log(`Finished ${m.Attributes.command}:${m.Attributes.originUuid}. MessageId ${m.MessageId}`);
+        console.log(`Finished ${m.MessageAttributes.command?.StringValue || 'UndefinedCommand'}:${m.MessageAttributes.originUuid?.StringValue || 'UndefinedOriginUuid'}. MessageId ${m.MessageId}`);
       } catch (err) {
-        console.error(`Error processing ${m.Attributes.command}:${m.Attributes.originUuid}. MessageId ${m.MessageId}`, err);
+        console.error(`Error processing ${m.MessageAttributes.command?.StringValue || 'UndefinedCommand'}:${m.MessageAttributes.originUuid?.StringValue || 'UndefinedOriginUuid'}. MessageId ${m.MessageId}`, err);
       }
     }
   }
@@ -58,22 +74,23 @@ export class MessageQueue {
           QueueUrl: s.url,
           MaxNumberOfMessages: 1,
           VisibilityTimeout: 120,
-          WaitTimeSeconds: 30,
+          WaitTimeSeconds: 20,
           MessageAttributeNames: ['command', 'originUuid'],
         }).promise();
         pollingPromises.push(recvCall);
       }
       const pollingResults = await Promise.all(pollingPromises);
+      // debugMessage('I', 'PollingResults', pollingResults);
 
       // For each polling result execute its subscription callback without breaking the loop
       for (const [idx, r] of pollingResults.entries()) {
         // r is any of AWS.SQS.ReceiveMessageResult | AWS.AWSError
-        if (r.Messages !== undefined) {
-          const res = r as AWS.SQS.ReceiveMessageResult;
-          await this.executeCallbackOnMessages(res.Messages, this.subscriptions[idx]);
-        } else {
+        if (r.retryable !== undefined) {
           const res = r as AWS.AWSError;
           console.error(`MessageQueue: Error while polling ${this.subscriptions[idx].name}. ${res.message}`, res);
+        } else if (r.Messages !== undefined){
+          const res = r as AWS.SQS.ReceiveMessageResult;
+          await this.executeCallbackOnMessages(res.Messages, this.subscriptions[idx]);
         }
       }
     }

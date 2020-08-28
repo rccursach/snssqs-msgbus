@@ -1,6 +1,19 @@
 import AWS from 'aws-sdk';
 import { v4 } from 'uuid';
 
+const debugMessage = (type: 'E'| 'I', message: string, data?: any) => {
+  if (process.env.SNSSQS_MESSAGE_BUS_DEBUG) {
+    switch(type) {
+      case 'I':
+        console.log(`Info: ${message}`, data);
+        break;
+      case 'E':
+        console.error(`Error: ${message}`, data);
+        break;
+    }
+  }
+}
+
 export class MessageBus {
   constructor(awsRegion: string, snsTopicARN: string) {
     this.snsInstance = new AWS.SNS({
@@ -17,27 +30,34 @@ export class MessageBus {
       throw new Error('commandName must be in PascalCase. Ex: DeliverEmail');
     }
     const originUuid = v4(); // Not 100% sure if needed
-    const result: AWS.SNS.PublishResponse | AWS.AWSError = await this.snsInstance.publish({
-      TopicArn: this.topicARN,
-      MessageAttributes: {
-        'command': {
-          DataType: 'STRING_VALUE',
-          StringValue: commandName,
+    // debugMessage('I', 'This is originUuid', originUuid);
+    try {
+      const result: AWS.SNS.PublishResponse | AWS.AWSError = await this.snsInstance.publish({
+        TargetArn: this.topicARN,
+        MessageAttributes: {
+          'command': {
+            DataType: 'String',
+            StringValue: commandName,
+          },
+          'originUuid': {
+            DataType: 'String',
+            StringValue: originUuid as string,
+          },
         },
-        'originUuid': {
-          DataType: 'STRING_VALUE',
-          StringValue: originUuid,
-        },
-      },
-      Message: JSON.stringify(data),
-    }).promise();
+        Message: data
+      }).promise();
 
-    if (result.MessageId) {
-      const r = result as AWS.SNS.PublishResponse;
-      console.log(`${commandName} with Attr originId: ${originUuid} successfully dispatched. MessageId: ${r.MessageId}.`);
-    } else {
-      const error = result as AWS.AWSError;
-      throw new Error(`Error dispatching message ${error.code} - ${error.message}`);
+      // debugMessage('I', 'Sent message with body: ', JSON.stringify(data));
+      
+      if (result.MessageId) {
+        const r = result as AWS.SNS.PublishResponse;
+        console.log(`${commandName} with Attr originId: ${originUuid} successfully dispatched. MessageId: ${r.MessageId}.`);
+      } else {
+        const error = result as AWS.AWSError;
+        throw new Error(`Error dispatching message ${error.code} - ${error.message}`);
+      }
+    } catch (error) {
+      console.error(`sendCommand: Error ${error.message}`, error);
     }
   }
 }
