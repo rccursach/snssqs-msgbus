@@ -26,7 +26,7 @@ getMessageBus().sendCommand(process.env.SNS_COMMAND_NAME, JSON.stringify(command
 createMessageQueue(process.env.AWS_REGION);
 getMessageQueue().addSubscription(process.env.QUEUE_NAME, process.env.QUEUE_URL, (messageId, messageBody) => {
   console.log(`Received a message with MessageId:${messageId} and body: ${messageBody}`);
-  if (1 === 1) { throw new Error('Test error'); }
+  if (process.env.FAIL_TEST) { throw new Error('Test error'); }
   if (String(messageBody).includes(String(timestamp))) {
     received = true;
   }
