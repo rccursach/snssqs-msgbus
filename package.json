@@ -1,6 +1,6 @@
 {
   "name": "snssqs-msgbus",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "SNS and SQS message bus + queue",
   "keywords": [
     "SNS",
