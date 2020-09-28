@@ -77,6 +77,8 @@ getMessageQueue().run();
 
 * Add subscription with `Queue_Y`'s ARN
 
+* Select `Enable raw message delivery` (it __MUST BE SELECTED__ !) 
+
 * On subscription filter policy add this (which commands will enter the queue)
 
 ```json

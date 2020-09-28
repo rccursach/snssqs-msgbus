@@ -29,8 +29,10 @@ export class MessageQueue {
   // Try to run this in a contained way, to avoid breaking other running callbacks
   private async executeCallbackOnMessages(messages: AWS.SQS.MessageList, subInfo: MessageQueueSub) {
     for (const m of messages) {
+      console.log('Message arrived');
+      console.log(m);
       try {
-        console.log(`Processing ${m.MessageAttributes.command?.StringValue || 'UndefinedCommand'}:${m.MessageAttributes.originUuid?.StringValue || 'UndefinedOriginUuid'}. MessageId ${m.MessageId}`);
+        console.log(`Processing ${m.MessageAttributes?.command?.StringValue || 'UndefinedCommand'}:${m.MessageAttributes?.originUuid?.StringValue || 'UndefinedOriginUuid'}. MessageId ${m.MessageId}`);
         // detect if callback is async and act accordingly
         if (subInfo.cb.constructor.name === "AsyncFunction") {
           await subInfo.cb(m.MessageId, m.Body, m.MessageAttributes);
@@ -42,9 +44,9 @@ export class MessageQueue {
           ReceiptHandle: m.ReceiptHandle,
           QueueUrl: subInfo.url,
         }).promise();
-        console.log(`Finished ${m.MessageAttributes.command?.StringValue || 'UndefinedCommand'}:${m.MessageAttributes.originUuid?.StringValue || 'UndefinedOriginUuid'}. MessageId ${m.MessageId}`);
+        console.log(`Finished ${m.MessageAttributes?.command?.StringValue || 'UndefinedCommand'}:${m.MessageAttributes?.originUuid?.StringValue || 'UndefinedOriginUuid'}. MessageId ${m.MessageId}`);
       } catch (err) {
-        console.error(`Error processing ${m.MessageAttributes.command?.StringValue || 'UndefinedCommand'}:${m.MessageAttributes.originUuid?.StringValue || 'UndefinedOriginUuid'}. MessageId ${m.MessageId}`, err);
+        console.error(`Error processing ${m.MessageAttributes?.command?.StringValue || 'UndefinedCommand'}:${m.MessageAttributes?.originUuid?.StringValue || 'UndefinedOriginUuid'}. MessageId ${m.MessageId}`, err);
       }
     }
   }

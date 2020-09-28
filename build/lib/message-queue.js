@@ -43,10 +43,12 @@ class MessageQueue {
         this.subscriptions = [];
     }
     async executeCallbackOnMessages(messages, subInfo) {
-        var _a, _b, _c, _d, _e, _f;
+        var _a, _b, _c, _d, _e, _f, _g, _h, _j, _k, _l, _m;
         for (const m of messages) {
+            console.log('Message arrived');
+            console.log(m);
             try {
-                console.log(`Processing ${((_a = m.MessageAttributes.command) === null || _a === void 0 ? void 0 : _a.StringValue) || 'UndefinedCommand'}:${((_b = m.MessageAttributes.originUuid) === null || _b === void 0 ? void 0 : _b.StringValue) || 'UndefinedOriginUuid'}. MessageId ${m.MessageId}`);
+                console.log(`Processing ${((_b = (_a = m.MessageAttributes) === null || _a === void 0 ? void 0 : _a.command) === null || _b === void 0 ? void 0 : _b.StringValue) || 'UndefinedCommand'}:${((_d = (_c = m.MessageAttributes) === null || _c === void 0 ? void 0 : _c.originUuid) === null || _d === void 0 ? void 0 : _d.StringValue) || 'UndefinedOriginUuid'}. MessageId ${m.MessageId}`);
                 if (subInfo.cb.constructor.name === "AsyncFunction") {
                     await subInfo.cb(m.MessageId, m.Body, m.MessageAttributes);
                 }
@@ -57,10 +59,10 @@ class MessageQueue {
                     ReceiptHandle: m.ReceiptHandle,
                     QueueUrl: subInfo.url,
                 }).promise();
-                console.log(`Finished ${((_c = m.MessageAttributes.command) === null || _c === void 0 ? void 0 : _c.StringValue) || 'UndefinedCommand'}:${((_d = m.MessageAttributes.originUuid) === null || _d === void 0 ? void 0 : _d.StringValue) || 'UndefinedOriginUuid'}. MessageId ${m.MessageId}`);
+                console.log(`Finished ${((_f = (_e = m.MessageAttributes) === null || _e === void 0 ? void 0 : _e.command) === null || _f === void 0 ? void 0 : _f.StringValue) || 'UndefinedCommand'}:${((_h = (_g = m.MessageAttributes) === null || _g === void 0 ? void 0 : _g.originUuid) === null || _h === void 0 ? void 0 : _h.StringValue) || 'UndefinedOriginUuid'}. MessageId ${m.MessageId}`);
             }
             catch (err) {
-                console.error(`Error processing ${((_e = m.MessageAttributes.command) === null || _e === void 0 ? void 0 : _e.StringValue) || 'UndefinedCommand'}:${((_f = m.MessageAttributes.originUuid) === null || _f === void 0 ? void 0 : _f.StringValue) || 'UndefinedOriginUuid'}. MessageId ${m.MessageId}`, err);
+                console.error(`Error processing ${((_k = (_j = m.MessageAttributes) === null || _j === void 0 ? void 0 : _j.command) === null || _k === void 0 ? void 0 : _k.StringValue) || 'UndefinedCommand'}:${((_m = (_l = m.MessageAttributes) === null || _l === void 0 ? void 0 : _l.originUuid) === null || _m === void 0 ? void 0 : _m.StringValue) || 'UndefinedOriginUuid'}. MessageId ${m.MessageId}`, err);
             }
         }
     }
