@@ -8,6 +8,11 @@ export class MessageBus {
       region: awsRegion,
     });
     this.topicARN = snsTopicARN;
+    // Set logger for debug
+    if (process.env.DEBUG && String(process.env.DEBUG).toLowerCase() === 'true') {
+      console.log('MessageBus: AWS logger set to console');
+      AWS.config.logger = console;
+    }
   }
   snsInstance: AWS.SNS;
   topicARN: string;

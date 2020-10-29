@@ -29,7 +29,7 @@
     "lintf": "eslint \"{src,apps,libs,test}/**/*.ts\" --fix",
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
     "test": "echo 'Not implemented yet'; exit 1",
-    "testx": "ts-node ./tests/test.ts"
+    "testx": "DEBUG=true ts-node ./tests/test.ts"
   },
   "bugs": {
     "url": "https://github.com/rccursach/snssqs-msgbus/issues"
