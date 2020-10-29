@@ -13,6 +13,10 @@ class MessageBus {
             region: awsRegion,
         });
         this.topicARN = snsTopicARN;
+        if (process.env.DEBUG && String(process.env.DEBUG).toLowerCase() === 'true') {
+            console.log('MessageBus: AWS logger set to console');
+            aws_sdk_1.default.config.logger = console;
+        }
     }
     async sendCommand(commandName, data) {
         if (commandName.match(/\b[A-Z][a-z]*([A-Z][a-z]*)*\b/g).length === 0) {
