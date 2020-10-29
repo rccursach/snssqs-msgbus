@@ -41,12 +41,14 @@ class MessageQueue {
         this.status = 'STOPPED';
         this.timeoutHandler = undefined;
         this.subscriptions = [];
+        if (process.env.DEBUG && String(process.env.DEBUG).toLowerCase() === 'true') {
+            console.log('MessageQueue: AWS logger set to console');
+            aws_sdk_1.default.config.logger = console;
+        }
     }
     async executeCallbackOnMessages(messages, subInfo) {
         var _a, _b, _c, _d, _e, _f, _g, _h, _j, _k, _l, _m;
         for (const m of messages) {
-            console.log('Message arrived');
-            console.log(m);
             try {
                 console.log(`Processing ${((_b = (_a = m.MessageAttributes) === null || _a === void 0 ? void 0 : _a.command) === null || _b === void 0 ? void 0 : _b.StringValue) || 'UndefinedCommand'}:${((_d = (_c = m.MessageAttributes) === null || _c === void 0 ? void 0 : _c.originUuid) === null || _d === void 0 ? void 0 : _d.StringValue) || 'UndefinedOriginUuid'}. MessageId ${m.MessageId}`);
                 if (subInfo.cb.constructor.name === "AsyncFunction") {

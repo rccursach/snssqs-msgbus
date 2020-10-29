@@ -18,6 +18,11 @@ export class MessageQueue {
     this.status = 'STOPPED';
     this.timeoutHandler = undefined;
     this.subscriptions = [];
+    // Set logger for debug
+    if (process.env.DEBUG && String(process.env.DEBUG).toLowerCase() === 'true') {
+      console.log('MessageQueue: AWS logger set to console');
+      AWS.config.logger = console;
+    }
   }
 
   sqsInstance: AWS.SQS;
@@ -29,8 +34,6 @@ export class MessageQueue {
   // Try to run this in a contained way, to avoid breaking other running callbacks
   private async executeCallbackOnMessages(messages: AWS.SQS.MessageList, subInfo: MessageQueueSub) {
     for (const m of messages) {
-      console.log('Message arrived');
-      console.log(m);
       try {
         console.log(`Processing ${m.MessageAttributes?.command?.StringValue || 'UndefinedCommand'}:${m.MessageAttributes?.originUuid?.StringValue || 'UndefinedOriginUuid'}. MessageId ${m.MessageId}`);
         // detect if callback is async and act accordingly
