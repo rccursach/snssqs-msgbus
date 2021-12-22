@@ -11,19 +11,10 @@
     "outDir": "./build",
     "rootDir": "./src",
     "baseUrl": "./src",
-    "paths": {
-      "@api/*": ["api/*"],
-      "@config/*": ["config/*"],
-      "@database/*": ["database/*"],
-      "@models/*": ["models/*"],
-      "@providers/*": ["providers/*"],
-      "@server/*": ["server/*"],
-      "@services/*": ["services/*"],
-      "@utils/*": ["utils/*"],
-    },
+    "allowJs": true,
     "incremental": true
   },
-  "exclude": ["node_modules", "build", "common", "tests"]
+  "exclude": ["node_modules", "build", "dist", "common", "tests"]
 }
 
 // {
