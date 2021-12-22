@@ -3,11 +3,13 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.MessageBus = void 0;
+exports.MessageBusAWS = void 0;
 const aws_sdk_1 = __importDefault(require("aws-sdk"));
 const uuid_1 = require("uuid");
-class MessageBus {
+const types_1 = require("./types");
+class MessageBusAWS extends types_1.MessageBus {
     constructor(awsRegion, snsTopicARN) {
+        super(awsRegion, snsTopicARN);
         this.snsInstance = new aws_sdk_1.default.SNS({
             apiVersion: '2012-11-05',
             region: awsRegion,
@@ -22,7 +24,7 @@ class MessageBus {
         if (commandName.match(/\b[A-Z][a-z]*([A-Z][a-z]*)*\b/g).length === 0) {
             throw new Error('commandName must be in PascalCase. Ex: DeliverEmail');
         }
-        const originUuid = uuid_1.v4();
+        const originUuid = (0, uuid_1.v4)();
         try {
             const result = await this.snsInstance.publish({
                 TargetArn: this.topicARN,
@@ -52,5 +54,5 @@ class MessageBus {
         }
     }
 }
-exports.MessageBus = MessageBus;
+exports.MessageBusAWS = MessageBusAWS;
 //# sourceMappingURL=message-bus.js.map

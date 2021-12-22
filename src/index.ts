@@ -1,5 +1,8 @@
-import { MessageBus } from './lib/message-bus';
-import { MessageQueue } from './lib/message-queue';
+import { MessageBus, MessageQueue } from 'lib/types';
+import { MessageBusAWS } from './lib/message-bus';
+import { MessageQueueAWS } from './lib/message-queue';
+import { MessageBusRedis } from './lib/message-bus-redis';
+import { MessageQueueRedis } from './lib/message-queue-redis';
 
 let messageBus: MessageBus = undefined;
 let messageQueue: MessageQueue = undefined;
@@ -15,7 +18,11 @@ export const createMessageBus = (awsRegion: string, snsTopicARN: string): Messag
     console.error('createMessageBus(): MessageBus instance is already defined');
     return messageBus;
   }
-  messageBus = new MessageBus(awsRegion, snsTopicARN);
+  if (process.env.REDIS_URL && String(process.env.MSGBUS_REDIS_MOCK).toUpperCase() === 'TRUE') {
+    messageBus = new MessageBusRedis(awsRegion, snsTopicARN);
+  } else {
+    messageBus = new MessageBusAWS(awsRegion, snsTopicARN);
+  }
   return messageBus;
 }
 
@@ -33,7 +40,12 @@ export const createMessageQueue = (awsRegion: string): MessageQueue => {
     console.error('createMessageQueue(): MessageQueue instance is already defined');
     return messageQueue;
   }
-  messageQueue = new MessageQueue(awsRegion);
+  if (process.env.REDIS_URL && String(process.env.MSGBUS_REDIS_MOCK).toUpperCase() === 'TRUE') {
+    messageQueue = new MessageQueueRedis(awsRegion);
+  }
+  else {
+    messageQueue = new MessageQueueAWS(awsRegion);
+  }
   return messageQueue;
 }
 

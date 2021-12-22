@@ -1,8 +1,10 @@
 import AWS from 'aws-sdk';
 import { v4 } from 'uuid';
+import { MessageBus } from './types';
 
-export class MessageBus {
+export class MessageBusAWS extends MessageBus {
   constructor(awsRegion: string, snsTopicARN: string) {
+    super(awsRegion, snsTopicARN);
     this.snsInstance = new AWS.SNS({
       apiVersion: '2012-11-05',
       region: awsRegion,
