@@ -29,13 +29,14 @@
     "lintf": "eslint \"{src,apps,libs,test}/**/*.ts\" --fix",
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
     "test": "echo 'Not implemented yet'; exit 1",
-    "testx": "DEBUG=true ts-node ./tests/test.ts"
+    "testx": "yarn build && DEBUG=true node ./tests/testx.js"
   },
   "bugs": {
     "url": "https://github.com/rccursach/snssqs-msgbus/issues"
   },
   "dependencies": {
     "aws-sdk": "^2.624.0",
+    "lucky-case": "^1.1.2",
     "moment": "^2.24.0",
     "uuid": "^8.3.0"
   },
@@ -52,8 +53,8 @@
     "jest-cli": "^24.9.0",
     "nodemon": "^2.0.1",
     "prettier": "^2.0.5",
-    "ts-node": "^8.10.2",
-    "typescript": "^3.9.7"
+    "ts-node": "^10.4.0",
+    "typescript": "^4.5.4"
   },
   "engines": {
     "node": ">=12",

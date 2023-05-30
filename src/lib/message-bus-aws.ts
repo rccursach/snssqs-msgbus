@@ -5,10 +5,16 @@ import { MessageBus } from './types';
 export class MessageBusAWS extends MessageBus {
   constructor(awsRegion: string, snsTopicARN: string) {
     super(awsRegion, snsTopicARN);
-    this.snsInstance = new AWS.SNS({
+    let ep: AWS.Endpoint;
+    const options = {
       apiVersion: '2012-11-05',
       region: awsRegion,
-    });
+    };
+    if (process.env.AWS_ENDPOINT_URL || process.env.AWS_ENDPOINT_SNS_URL) {
+      ep = new AWS.Endpoint(process.env.AWS_ENDPOINT_URL || process.env.AWS_ENDPOINT_SNS_URL);
+      options['endpoint'] = ep;
+    }
+    this.snsInstance = new AWS.SNS(options);
     this.topicARN = snsTopicARN;
     // Set logger for debug
     if (process.env.DEBUG && String(process.env.DEBUG).toLowerCase() === 'true') {

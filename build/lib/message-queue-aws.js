@@ -3,11 +3,12 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.MessageQueue = void 0;
+exports.MessageQueueAWS = void 0;
 const aws_sdk_1 = __importDefault(require("aws-sdk"));
-;
-class MessageQueue {
+const types_1 = require("./types");
+class MessageQueueAWS extends types_1.MessageQueue {
     constructor(awsRegion) {
+        super(awsRegion);
         this.loopFn = async () => {
             while (this.status === 'RUNNING') {
                 const pollingPromises = [];
@@ -29,7 +30,8 @@ class MessageQueue {
                     }
                     else if (r.Messages !== undefined) {
                         const res = r;
-                        await this.executeCallbackOnMessages(res.Messages, this.subscriptions[idx]);
+                        console.log(`received message`, res.Messages);
+                        await this._executeCallbackOnMessages(res.Messages, this.subscriptions[idx]);
                     }
                 }
             }
@@ -46,7 +48,7 @@ class MessageQueue {
             aws_sdk_1.default.config.logger = console;
         }
     }
-    async executeCallbackOnMessages(messages, subInfo) {
+    async _executeCallbackOnMessages(messages, subInfo) {
         var _a, _b, _c, _d, _e, _f, _g, _h, _j, _k, _l, _m;
         for (const m of messages) {
             try {
@@ -68,42 +70,21 @@ class MessageQueue {
             }
         }
     }
-    addSubscription(name, queueURL, callback) {
-        const exists = this.subscriptions.map(s => s.url).indexOf(queueURL) > -1;
-        if (exists) {
-            throw new Error(`Queue subscription already exists for ${queueURL}`);
-        }
-        this.subscriptions.push({
-            url: queueURL,
-            cb: callback,
-            name: name,
-        });
-    }
-    removeSubscription(name) {
-        const idx = this.subscriptions.map(s => s.name).indexOf(name);
-        if (idx === -1) {
-            throw new Error(`Queue sub '${name}' does not exists removing subscription.`);
-        }
-        this.subscriptions.splice(idx, 1);
-    }
     run() {
         if (this.status === 'RUNNING') {
-            throw new Error('Error: MessageQueue already running wen calling run()');
+            throw new Error('Error: MessageQueue already running when calling run()');
         }
         this.status = 'RUNNING';
         this.timeoutHandler = setTimeout(this.loopFn, 1);
     }
     stop() {
         if (this.status === 'STOPPED') {
-            throw new Error('Error: MessageQueue already stoped wen calling stop()');
+            throw new Error('Error: MessageQueue already stoped when calling stop()');
         }
         clearTimeout(this.timeoutHandler);
         this.status = 'STOPPED';
         this.timeoutHandler = undefined;
     }
-    getStatus() {
-        return this.status;
-    }
 }
-exports.MessageQueue = MessageQueue;
-//# sourceMappingURL=message-queue.js.map
+exports.MessageQueueAWS = MessageQueueAWS;
+//# sourceMappingURL=message-queue-aws.js.map

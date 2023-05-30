@@ -2,7 +2,10 @@
 
 A message bus using AWS SNS Topics and SQS Queues
 
+
+___
 ## Install
+
 
 npm
 ```bash
@@ -14,7 +17,10 @@ yarn
 $ yarn add snssqs-msgbus
 ```
 
+
+___
 ## Usage
+
 
 This lib provides two classes, `MessageBus` and `MessageQueue`. MessageBus will send command messages (AWS SNS), while
 MessageQueue will gather messages from a queue (AWS SQS).
@@ -22,7 +28,9 @@ MessageQueue will gather messages from a queue (AWS SQS).
 _Both `MessageBus` and `MessageQueue` will retrieve credentials from the [Default credentials chain](https://docs.aws.amazon.com/sdk-for-javascript/v2/developer-guide/setting-credentials-node.html)._
 
 
-### MessageBus
+___
+## MessageBus
+
 
 Send messages to services through SNS Topic.
 
@@ -44,7 +52,10 @@ getMessageBus().sendCommand('PascalCasedCommandName', JSON.stringify(commandData
 // This will send a SNS message with Attribute command=PascalCasedCommandName and MessageBody=commandData
 ```
 
-### MessageQueue
+
+___
+## MessageQueue
+
 
 Receive commands and data from a SQS Queue.
 
@@ -68,7 +79,9 @@ getMessageQueue().run();
 ```
 
 
+___
 ## AWS Setup:
+
 
 1) Create SNS `Topic_X`
 2) Create a SQS `Queue_Y`

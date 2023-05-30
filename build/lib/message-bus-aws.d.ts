@@ -1,5 +1,6 @@
 import AWS from 'aws-sdk';
-export declare class MessageBus {
+import { MessageBus } from './types';
+export declare class MessageBusAWS extends MessageBus {
     constructor(awsRegion: string, snsTopicARN: string);
     snsInstance: AWS.SNS;
     topicARN: string;
