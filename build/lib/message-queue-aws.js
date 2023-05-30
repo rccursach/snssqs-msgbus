@@ -87,4 +87,4 @@ class MessageQueueAWS extends types_1.MessageQueue {
     }
 }
 exports.MessageQueueAWS = MessageQueueAWS;
-//# sourceMappingURL=message-queue.js.map
+//# sourceMappingURL=message-queue-aws.js.map

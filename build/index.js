@@ -1,10 +1,8 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.getMessageQueue = exports.createMessageQueue = exports.getMessageBus = exports.createMessageBus = void 0;
-const message_bus_1 = require("./lib/message-bus");
-const message_queue_1 = require("./lib/message-queue");
-const message_bus_redis_1 = require("./lib/message-bus-redis");
-const message_queue_redis_1 = require("./lib/message-queue-redis");
+const message_bus_aws_1 = require("./lib/message-bus-aws");
+const message_queue_aws_1 = require("./lib/message-queue-aws");
 let messageBus = undefined;
 let messageQueue = undefined;
 const createMessageBus = (awsRegion, snsTopicARN) => {
@@ -12,12 +10,7 @@ const createMessageBus = (awsRegion, snsTopicARN) => {
         console.error('createMessageBus(): MessageBus instance is already defined');
         return messageBus;
     }
-    if (process.env.REDIS_URL && String(process.env.MSGBUS_REDIS_MOCK).toUpperCase() === 'TRUE') {
-        messageBus = new message_bus_redis_1.MessageBusRedis(awsRegion, snsTopicARN);
-    }
-    else {
-        messageBus = new message_bus_1.MessageBusAWS(awsRegion, snsTopicARN);
-    }
+    messageBus = new message_bus_aws_1.MessageBusAWS(awsRegion, snsTopicARN);
     return messageBus;
 };
 exports.createMessageBus = createMessageBus;
@@ -30,12 +23,7 @@ const createMessageQueue = (awsRegion) => {
         console.error('createMessageQueue(): MessageQueue instance is already defined');
         return messageQueue;
     }
-    if (process.env.REDIS_URL && String(process.env.MSGBUS_REDIS_MOCK).toUpperCase() === 'TRUE') {
-        messageQueue = new message_queue_redis_1.MessageQueueRedis(awsRegion);
-    }
-    else {
-        messageQueue = new message_queue_1.MessageQueueAWS(awsRegion);
-    }
+    messageQueue = new message_queue_aws_1.MessageQueueAWS(awsRegion);
     return messageQueue;
 };
 exports.createMessageQueue = createMessageQueue;

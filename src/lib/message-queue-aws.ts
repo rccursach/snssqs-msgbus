@@ -4,10 +4,16 @@ import { MessageQueue, MessageQueueSub } from './types';
 export class MessageQueueAWS extends MessageQueue {
   constructor(awsRegion: string) {
     super(awsRegion);
-    this.sqsInstance = new AWS.SQS({
+    let ep: AWS.Endpoint;
+    const options = {
       apiVersion: '2012-11-05',
       region: awsRegion,
-    });
+    };
+    if (process.env.AWS_ENDPOINT_URL || process.env.AWS_ENDPOINT_SQS_URL) {
+      ep = new AWS.Endpoint(process.env.AWS_ENDPOINT_URL || process.env.AWS_ENDPOINT_SQS_URL);
+      options['endpoint'] = ep;
+    }
+    this.sqsInstance = new AWS.SQS(options);
     this.status = 'STOPPED';
     this.timeoutHandler = undefined;
     this.subscriptions = [];

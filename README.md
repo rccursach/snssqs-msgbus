@@ -29,16 +29,6 @@ _Both `MessageBus` and `MessageQueue` will retrieve credentials from the [Defaul
 
 
 ___
-## Redis local mock (Not for production)
-
-
-For rapid development, a Redis backed mock can be used. It is not queued based, but a pub/sub,
-So any messages not consumed by a client will be lost, and `at-lest-once` or `exactly-once` are not possible.
-
-See: [REDIS_MOCK](./REDIS_MOCK.md)
-
-
-___
 ## MessageBus
 
 

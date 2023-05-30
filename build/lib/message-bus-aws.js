@@ -10,10 +10,16 @@ const types_1 = require("./types");
 class MessageBusAWS extends types_1.MessageBus {
     constructor(awsRegion, snsTopicARN) {
         super(awsRegion, snsTopicARN);
-        this.snsInstance = new aws_sdk_1.default.SNS({
+        let ep;
+        const options = {
             apiVersion: '2012-11-05',
             region: awsRegion,
-        });
+        };
+        if (process.env.AWS_ENDPOINT_URL || process.env.AWS_ENDPOINT_SNS_URL) {
+            ep = new aws_sdk_1.default.Endpoint(process.env.AWS_ENDPOINT_URL || process.env.AWS_ENDPOINT_SNS_URL);
+            options['endpoint'] = ep;
+        }
+        this.snsInstance = new aws_sdk_1.default.SNS(options);
         this.topicARN = snsTopicARN;
         if (process.env.DEBUG && String(process.env.DEBUG).toLowerCase() === 'true') {
             console.log('MessageBus: AWS logger set to console');
@@ -55,4 +61,4 @@ class MessageBusAWS extends types_1.MessageBus {
     }
 }
 exports.MessageBusAWS = MessageBusAWS;
-//# sourceMappingURL=message-bus.js.map
+//# sourceMappingURL=message-bus-aws.js.map
